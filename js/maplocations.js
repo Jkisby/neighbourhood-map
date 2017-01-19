@@ -41,3 +41,4 @@ var initialLocations = [
 	}
 ];
 
+var infowindow = null;

@@ -15,8 +15,11 @@
 				<ul data-bind="foreach: filterList">
 					<li data-bind="text: title, click: $parent.setMapLocation"></li>
 				</ul>
-				<p>Points of Interest near here</p>
-				<ul data-bind="foreach: landmarklist">
+				<p>
+					Find things near here:
+					<select data-bind="options: availableFilters, value: selectedFilter, event: {change: onChange}, optionsCaption: 'Select..'"></select>
+				</p>
+				<ul data-bind="foreach: filterMap">
 					<li data-bind="text: title, click: $parent.setMapLocation"></li>
 				</ul>
 			</div>

@@ -1,10 +1,13 @@
 
 var viewModel = function(map){
 	var self = this;
+
 	self.locationlist = ko.observableArray([]);
 	self.landmarklist = ko.observableArray([]);
 	self.filter = ko.observable();
 	self.filteredList = ko.observableArray([]);
+	self.availableFilters = ko.observableArray(['none', 'art_gallery', 'library', 'gym', 'cafe', 'church', 'gas_station']);
+	self.selectedFilter = ko.observable();
 
 	initialLocations.forEach(function(mark){
 		var m = new google.maps.Marker({
@@ -25,8 +28,22 @@ var viewModel = function(map){
 		var center = new google.maps.LatLng(location.getPosition().lat(), location.getPosition().lng());
 		map.panTo(center);
 		self.currentLocation(location);
-		self.getLandmarks();
+		//self.getLandmarks();
+		//self.filter(null);
+		self.bounce(location);
+		self.infoWindow(location);
 	};
+
+	self.onChange = function(){
+		if(self.selectedFilter() == 'none'){
+			for(var i = 0; i < self.landmarklist().length; i++){
+				self.landmarklist()[i].setMap(null);
+			}
+			self.landmarklist([]);
+		}else{
+			self.getLandmarks(self.selectedFilter());
+		}
+	}
 
 	this.filterList = ko.computed(function(){
 		var filter = self.filter();
@@ -34,10 +51,41 @@ var viewModel = function(map){
 			return self.locationlist();
 		}else{
 			return ko.utils.arrayFilter(self.locationlist(), function(location){
-				return location.getTitle().toLowerCase().startsWith(filter);
+				var locations = location.getTitle().toLowerCase().startsWith(filter);
+				if(!locations){
+					location.setMap(null);
+				}else{
+					location.setMap(map);
+				}
+				return locations;
 			});
 		}
 	});
+
+	this.filterMap = ko.computed(function(){
+		var filter = self.filter();
+		if(!filter){
+			for(var i = 0; i < Math.max(self.landmarklist().length, self.locationlist().length); i++){
+				if(i < self.landmarklist().length){
+					self.landmarklist()[i].setMap(map);
+				}
+				if(i < self.locationlist().length){
+					self.locationlist()[i].setMap(map);
+				}
+			}
+			return self.landmarklist();
+		}else{
+			return ko.utils.arrayFilter(self.landmarklist(), function(location){
+				var locations = location.getTitle().toLowerCase().startsWith(filter);
+				if(!locations){
+					location.setMap(null);
+				}else{
+					location.setMap(map);
+				}
+				return locations;
+			});
+		}
+	})
 
 	this.noResults = ko.computed(function(){
 		if(self.filterList().length === 0){
@@ -47,8 +95,7 @@ var viewModel = function(map){
 		}
 	});
 
-	this.getLandmarks = function(){
-		console.log(self.landmarklist().length);
+	this.getLandmarks = function(type){
 		for(var i = 0; i < self.landmarklist().length; i++){
 			self.landmarklist()[i].setMap(null);
 		}
@@ -56,8 +103,8 @@ var viewModel = function(map){
 		var service = new google.maps.places.PlacesService(map);
 		service.nearbySearch({
 			location: map.getCenter(),
-			radius: '500',
-			types: ['point_of_interest']
+			radius: '1500',
+			types: [type]
 		}, self.callback);
 	};
 
@@ -72,7 +119,7 @@ var viewModel = function(map){
         		});
         		marker.setAnimation(null);
       			marker.addListener('click', function(){
-      				self.bounce(this);
+      				self.infoWindow(this);
       			});
       			self.landmarklist.push(marker);
     		}		
@@ -86,7 +133,18 @@ var viewModel = function(map){
 		}, 750);
 	}
 
-	self.getLandmarks();
+	this.infoWindow = function(marker){
+		self.bounce(marker);
+		if(infowindow){
+			infowindow.close();
+		}
+		infowindow = new google.maps.InfoWindow({
+    		content: marker.title
+  		});
+  		infowindow.open(map, marker);		
+	}
+
+	self.getLandmarks('point_of_interest');
 };
 
 function initMap() {
