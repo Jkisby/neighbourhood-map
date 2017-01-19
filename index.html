@@ -10,7 +10,9 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="col-md-2">
-				<ul data-bind="foreach: locationlist">
+			<p>Filter: <input data-bind="value: filter, valueUpdate: 'afterkeydown'" /></p>
+			<p data-bind="if: noResults, valueUpdate: 'afterkeydown'">No results!</p>
+				<ul data-bind="foreach: filterList">
 					<li data-bind="text: title, click: $parent.setMapLocation"></li>
 				</ul>
 			</div>
