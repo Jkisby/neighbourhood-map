@@ -1,8 +1,8 @@
 var initialLocations = [
 	{
 		pos: {
-			lat: -25.363,
-			lng: 131.044
+			lat: 51.516461,
+			lng: -0.0675845
 		},
 		title: "title1",
 		img: "img/img1.jpg"
@@ -41,5 +41,3 @@ var initialLocations = [
 	}
 ];
 
-var landmarks = "https://maps.googleapis.com/maps/api/place/nearbysearch/"
-				+ "json?location=%lat%,%lng%&radius=150&key=AIzaSyCdsY4LFODHr3YVRwoK4XClAUBQrMS8h9I"

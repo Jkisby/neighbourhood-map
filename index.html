@@ -10,9 +10,13 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="col-md-2">
-			<p>Filter: <input data-bind="value: filter, valueUpdate: 'afterkeydown'" /></p>
+			<p>Filter my places: <input data-bind="value: filter, valueUpdate: 'afterkeydown'" /></p>
 			<p data-bind="if: noResults, valueUpdate: 'afterkeydown'">No results!</p>
 				<ul data-bind="foreach: filterList">
+					<li data-bind="text: title, click: $parent.setMapLocation"></li>
+				</ul>
+				<p>Points of Interest near here</p>
+				<ul data-bind="foreach: landmarklist">
 					<li data-bind="text: title, click: $parent.setMapLocation"></li>
 				</ul>
 			</div>
@@ -20,7 +24,7 @@
 		</div>
 	</div>
 <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdsY4LFODHr3YVRwoK4XClAUBQrMS8h9I&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdsY4LFODHr3YVRwoK4XClAUBQrMS8h9I&libraries=places&callback=initMap">
     </script>
 	<script src="js/libs/jquery.min.js"></script>
 	<script src="js/libs/knockout-3.4.1.js"></script>
