@@ -180,10 +180,10 @@ var viewModel = function(map){
 		self.photos([]);
 		var api = flickrAPI.replace('%lat%', location.getPosition().lat());
 		api = api.replace('%lon%', location.getPosition().lng());
+		self.infoWindow(location);
 		$.getJSON(api, function(data){
 			self.setPhotos(data, location);
-
-		});
+		}).fail(function() { alert("error - Cannot connect to Flickr"); });
 	};
 
 	this.setPhotos = function(data, location){
@@ -192,7 +192,7 @@ var viewModel = function(map){
 			self.photos.push("http://farm" + item.farm + ".static.flickr.com/"
 							 + item.server +"/"+ item.id + "_" + item.secret + "_m.jpg");
 		}
-		self.infoWindow(location);
+		
 	};
 
 	// Initiate default set of landmarks
