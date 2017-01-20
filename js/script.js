@@ -1,50 +1,67 @@
 
+// Viewmodel containing methods to interact with view
 var viewModel = function(map){
 	var self = this;
-
+	
+	// knockout observables 
 	self.locationlist = ko.observableArray([]);
 	self.landmarklist = ko.observableArray([]);
 	self.filter = ko.observable();
 	self.filteredList = ko.observableArray([]);
-	self.availableFilters = ko.observableArray(['none', 'art_gallery', 'library', 'gym', 'cafe', 'church', 'gas_station']);
+	self.photos = ko.observableArray([]);
+	self.availableFilters = ko.observableArray([
+		new Type('None', 'none'),
+		new Type('Libraries', 'library'),
+		new Type('Gyms', 'gym'),
+		new Type('Cafes', 'cafe'),
+		new Type('Churches', 'church'),
+		new Type('Petrol Stations', 'gas_station'),
+		new Type('Art galleries', 'art_gallery'),
+	]);
 	self.selectedFilter = ko.observable();
 
+	// Create markers for initial locations
 	initialLocations.forEach(function(mark){
 		var m = new google.maps.Marker({
 			position: mark.pos,
 			map: map,
-			title: mark.title
+			title: mark.title,
+			icon: 'img/blue_marker.png'
 		});
+		// add listener to marker for info window
 		m.setAnimation(null);
       			m.addListener('click', function(){
-      				self.bounce(this);
+      				self.getLocationPhotos(this);
       			});
+      	// add marker to ko observableArray
 		self.locationlist.push(m);
 	});
 
+	// set current location
 	self.currentLocation = ko.observable(self.locationlist()[0]);
 
+	// center map around current location and open info window when selection from list
 	this.setMapLocation = function(location){
 		var center = new google.maps.LatLng(location.getPosition().lat(), location.getPosition().lng());
 		map.panTo(center);
 		self.currentLocation(location);
-		//self.getLandmarks();
-		//self.filter(null);
-		self.bounce(location);
-		self.infoWindow(location);
+		self.getLocationPhotos(location);
 	};
 
+	// update landmark list view when select option is changed
 	self.onChange = function(){
+		// remove landmarks if none selected
 		if(self.selectedFilter() == 'none'){
 			for(var i = 0; i < self.landmarklist().length; i++){
 				self.landmarklist()[i].setMap(null);
 			}
 			self.landmarklist([]);
 		}else{
-			self.getLandmarks(self.selectedFilter());
+			self.getLandmarks(self.selectedFilter().getData());
 		}
 	}
 
+	// filter initial locations based on filter text input
 	this.filterList = ko.computed(function(){
 		var filter = self.filter();
 		if(!filter){
@@ -62,6 +79,7 @@ var viewModel = function(map){
 		}
 	});
 
+	// filter landmark list and map markers based on filter text input
 	this.filterMap = ko.computed(function(){
 		var filter = self.filter();
 		if(!filter){
@@ -87,6 +105,7 @@ var viewModel = function(map){
 		}
 	})
 
+	// Check for results after filtering initial list
 	this.noResults = ko.computed(function(){
 		if(self.filterList().length === 0){
 			return true;
@@ -95,7 +114,9 @@ var viewModel = function(map){
 		}
 	});
 
+	// get landmark markers via google places api by type specified from select dropdown
 	this.getLandmarks = function(type){
+		// clear landmark array before updating
 		for(var i = 0; i < self.landmarklist().length; i++){
 			self.landmarklist()[i].setMap(null);
 		}
@@ -108,6 +129,7 @@ var viewModel = function(map){
 		}, self.callback);
 	};
 
+ 	// callback function for google places api
 	this.callback = function(results, status) {
   		if (status == google.maps.places.PlacesServiceStatus.OK) {
     		for (var i = 0; i < results.length; i++) {
@@ -119,13 +141,14 @@ var viewModel = function(map){
         		});
         		marker.setAnimation(null);
       			marker.addListener('click', function(){
-      				self.infoWindow(this);
+      				self.getLocationPhotos(this);
       			});
       			self.landmarklist.push(marker);
     		}		
   		}
 	}
 
+	// Initiate bounce animation for markers
 	this.bounce = function(marker){
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function () {
@@ -133,20 +156,49 @@ var viewModel = function(map){
 		}, 750);
 	}
 
+	// Open info window for current marker and close others if open
 	this.infoWindow = function(marker){
+		// add bounce animation when info window opens
 		self.bounce(marker);
+		self.currentLocation(marker);
+		console.log(self.currentLocation());
+		//self.getLocationPhotos(marker.getPosition().lat(), marker.getPosition().lng());
 		if(infowindow){
 			infowindow.close();
 		}
 		infowindow = new google.maps.InfoWindow({
-    		content: marker.title
+    		content: marker.title + modalButton
   		});
   		infowindow.open(map, marker);		
 	}
 
+	this.getLocationPhotos = function(location){
+		self.photos([]);
+		var api = flickrAPI.replace('%lat%', location.getPosition().lat());
+		api = api.replace('%lon%', location.getPosition().lng());
+		$.getJSON(api, function(data){
+			self.setPhotos(data, location);
+
+		});
+	}
+
+	this.setPhotos = function(data, location){
+		for(var i = 0; i < data.photos.photo.length; i++){
+			var item = data.photos.photo[i];
+			self.photos.push("http://farm"
+							+ item.farm 
+							+".static.flickr.com/"
+							+ item.server +"/"+ item.id 
+							+"_"+ item.secret +"_m.jpg");
+		}
+		self.infoWindow(location);
+	}
+
+	// Initiate default set of landmarks
 	self.getLandmarks('point_of_interest');
 };
 
+// Asynchronously load google map from google maps api
 function initMap() {
 	var map = new google.maps.Map(document.getElementById('map'), {
 		 zoom: 15,

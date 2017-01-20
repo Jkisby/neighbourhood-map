@@ -10,14 +10,15 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="col-md-2">
-			<p>Filter my places: <input data-bind="value: filter, valueUpdate: 'afterkeydown'" /></p>
+			<h4 data-bind="text: currentLocation().title">Flickr Images of </h4>
+			<p>Filter: <input data-bind="value: filter, valueUpdate: 'afterkeydown'" /></p>
 			<p data-bind="if: noResults, valueUpdate: 'afterkeydown'">No results!</p>
 				<ul data-bind="foreach: filterList">
 					<li data-bind="text: title, click: $parent.setMapLocation"></li>
 				</ul>
 				<p>
 					Find things near here:
-					<select data-bind="options: availableFilters, value: selectedFilter, event: {change: onChange}, optionsCaption: 'Select..'"></select>
+					<select data-bind="options: availableFilters, optionsText: 'typeName', value: selectedFilter, event: {change: onChange}, optionsCaption: 'Select..'"></select>
 				</p>
 				<ul data-bind="foreach: filterMap">
 					<li data-bind="text: title, click: $parent.setMapLocation"></li>
@@ -25,13 +26,41 @@
 			</div>
 			<div class="col-md-10" id="map"></div>
 		</div>
+
+
+  		<!-- Modal -->
+  		<div class="modal fade" id="myModal" role="dialog">
+    		<div class="modal-dialog modal-lg">
+    		  	<div class="modal-content">
+        			<div class="modal-header">
+          				<button type="button" class="close" data-dismiss="modal">&times;</button>
+          				<h4 class="modal-title" data-bind="text: currentLocation().title"></h4>
+        			</div>
+        			<div class="modal-body row">
+        				<ul data-bind="foreach: photos">
+          					<img class=" box col-md-6 img-responsive" data-bind="attr: {src: $data}">
+          					<div class="divider"></div>
+          				</ul>
+        			</div>
+        			<div class="modal-footer">
+        			<p>Images from Flickr</p>
+          				<button type="button" class="btn btn-default" data-dismiss="modal">
+          					Close
+          				</button>
+        			</div>
+      			</div>
+    		</div>
+  		</div>
+
 	</div>
-<script async defer
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdsY4LFODHr3YVRwoK4XClAUBQrMS8h9I&libraries=places&callback=initMap">
     </script>
-	<script src="js/libs/jquery.min.js"></script>
 	<script src="js/libs/knockout-3.4.1.js"></script>
-	<script src="js/maplocations.js"></script>
+	<script src="js/model.js"></script>
 	<script src="js/script.js"></script>
 </body>
 </html>

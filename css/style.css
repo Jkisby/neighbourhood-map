@@ -16,3 +16,11 @@ html, body {
 	height: 100%;
 	min-height: 100%;
 }
+
+.box {
+	padding: 20px;
+}
+
+ol, ul {
+	list-style: none;
+}
