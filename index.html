@@ -2,29 +2,44 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title></title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
+
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 	<div class="container-fluid">
 		<div class="row-fluid">
-			<div class="col-md-2">
-			<h4 data-bind="text: currentLocation().title">Flickr Images of </h4>
-			<p>Filter: <input data-bind="value: filter, valueUpdate: 'afterkeydown'" /></p>
-			<p data-bind="if: noResults, valueUpdate: 'afterkeydown'">No results!</p>
-				<ul data-bind="foreach: filterList">
-					<li data-bind="text: title, click: $parent.setMapLocation"></li>
-				</ul>
-				<p>
-					Find things near here:
-					<select data-bind="options: availableFilters, optionsText: 'typeName', value: selectedFilter, event: {change: onChange}, optionsCaption: 'Select..'"></select>
-				</p>
-				<ul data-bind="foreach: filterMap">
-					<li data-bind="text: title, click: $parent.setMapLocation"></li>
-				</ul>
+			<div class="col-lg-2 col-sm-3 col-xs-12 long no-padding">
+				<nav class="navbar navbar-default">
+					<div class="">
+      					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        					<span class="icon-bar"></span>
+        					<span class="icon-bar"></span>
+        					<span class="icon-bar"></span>                        
+      					</button>
+      					<h3 class="text-center">Neighbourhood Map</h3>
+    				</div>
+		
+    				<div class="collapse navbar-collapse" id="myNavbar">	
+						<p>Filter: <input data-bind="value: filter, valueUpdate: 'afterkeydown'"/></p>
+						<h3>My places</h3>
+						<p data-bind="if: noResults, valueUpdate: 'afterkeydown'">No results!</p>
+						<div class="list-group" data-bind="foreach: filterList">
+							<a class="list-group-item" data-bind="text: title, click: $parent.setMapLocation, css: {active: $parent.isChosen($data)}"></a>
+						</div>
+						<p>
+							Find things near here:
+							<select data-bind="options: availableFilters, optionsText: 'typeName', value: selectedFilter, event: {change: onChange}, optionsCaption: 'Select..'"></select>
+						</p>
+						<div class="list-group" data-bind="foreach: filterMap">
+							<a class="list-group-item" data-bind="text: title, click: $parent.setMapLocation, css: {active: $parent.isChosen($data)}"></a>
+						</div>
+					</div>
+				</nav>
 			</div>
-			<div class="col-md-10" id="map"></div>
+			<div class="col-lg-10 col-sm-9 col-xs-12 fix" id="map"></div>
 		</div>
 
 
@@ -38,7 +53,7 @@
         			</div>
         			<div class="modal-body row">
         				<ul data-bind="foreach: photos">
-          					<img class=" box col-md-6 img-responsive" data-bind="attr: {src: $data}">
+          					<img class=" box col-md-6 col-xs-12 img-responsive" data-bind="attr: {src: $data}">
           					<div class="divider"></div>
           				</ul>
         			</div>

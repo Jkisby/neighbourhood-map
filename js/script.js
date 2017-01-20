@@ -51,7 +51,7 @@ var viewModel = function(map){
 	// update landmark list view when select option is changed
 	self.onChange = function(){
 		// remove landmarks if none selected
-		if(self.selectedFilter() == 'none'){
+		if(self.selectedFilter().getData() == 'none'){
 			for(var i = 0; i < self.landmarklist().length; i++){
 				self.landmarklist()[i].setMap(null);
 			}
@@ -59,7 +59,7 @@ var viewModel = function(map){
 		}else{
 			self.getLandmarks(self.selectedFilter().getData());
 		}
-	}
+	};
 
 	// filter initial locations based on filter text input
 	this.filterList = ko.computed(function(){
@@ -103,7 +103,7 @@ var viewModel = function(map){
 				return locations;
 			});
 		}
-	})
+	});
 
 	// Check for results after filtering initial list
 	this.noResults = ko.computed(function(){
@@ -113,6 +113,11 @@ var viewModel = function(map){
 			return false;
 		}
 	});
+
+	// Check for chosen location to highlight list with css binding
+	this.isChosen = function(location){
+		return self.currentLocation() === location;
+	};
 
 	// get landmark markers via google places api by type specified from select dropdown
 	this.getLandmarks = function(type){
@@ -146,7 +151,7 @@ var viewModel = function(map){
       			self.landmarklist.push(marker);
     		}		
   		}
-	}
+	};
 
 	// Initiate bounce animation for markers
 	this.bounce = function(marker){
@@ -154,14 +159,13 @@ var viewModel = function(map){
         setTimeout(function () {
     		marker.setAnimation(null);
 		}, 750);
-	}
+	};
 
 	// Open info window for current marker and close others if open
 	this.infoWindow = function(marker){
 		// add bounce animation when info window opens
 		self.bounce(marker);
 		self.currentLocation(marker);
-		console.log(self.currentLocation());
 		//self.getLocationPhotos(marker.getPosition().lat(), marker.getPosition().lng());
 		if(infowindow){
 			infowindow.close();
@@ -170,7 +174,7 @@ var viewModel = function(map){
     		content: marker.title + modalButton
   		});
   		infowindow.open(map, marker);		
-	}
+	};
 
 	this.getLocationPhotos = function(location){
 		self.photos([]);
@@ -180,19 +184,16 @@ var viewModel = function(map){
 			self.setPhotos(data, location);
 
 		});
-	}
+	};
 
 	this.setPhotos = function(data, location){
 		for(var i = 0; i < data.photos.photo.length; i++){
 			var item = data.photos.photo[i];
-			self.photos.push("http://farm"
-							+ item.farm 
-							+".static.flickr.com/"
-							+ item.server +"/"+ item.id 
-							+"_"+ item.secret +"_m.jpg");
+			self.photos.push("http://farm" + item.farm + ".static.flickr.com/"
+							 + item.server +"/"+ item.id + "_" + item.secret + "_m.jpg");
 		}
 		self.infoWindow(location);
-	}
+	};
 
 	// Initiate default set of landmarks
 	self.getLandmarks('point_of_interest');
