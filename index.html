@@ -11,16 +11,16 @@
 <body>
 	<div class="container-fluid">
 		<div class="row-fluid">
-			<div class="col-lg-2 col-sm-3 col-xs-12 long no-padding">
+			<nav class="col-lg-2 col-sm-3 col-xs-12 long no-padding">
 				<nav class="navbar navbar-default">
-					<div class="">
+					<header class="">
       					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         					<span class="icon-bar"></span>
         					<span class="icon-bar"></span>
         					<span class="icon-bar"></span>                        
       					</button>
       					<h3 class="text-center">Neighbourhood Map</h3>
-    				</div>
+    				</header>
 		
     				<div class="collapse navbar-collapse" id="myNavbar">	
 						<p>Filter: <input data-bind="value: filter, valueUpdate: 'afterkeydown'"/></p>
@@ -38,8 +38,8 @@
 						</div>
 					</div>
 				</nav>
-			</div>
-			<div class="col-lg-10 col-sm-9 col-xs-12 fix" id="map"></div>
+			</nav>
+			<main class="col-lg-10 col-sm-9 col-xs-12 fix" id="map"></main>
 		</div>
 
 
@@ -52,10 +52,15 @@
           				<h4 class="modal-title" data-bind="text: currentLocation().title"></h4>
         			</div>
         			<div class="modal-body row">
-        				<ul data-bind="foreach: photos">
-          					<img class=" box col-md-6 col-xs-12 img-responsive" data-bind="attr: {src: $data}">
-          					<div class="divider"></div>
-          				</ul>
+        				<div data-bind="if: photos">
+        					<ul data-bind="foreach: photos()">
+          						<img class=" box col-md-6 col-xs-12 img-responsive" data-bind="attr: {src: $data}">
+          						<div class="divider"></div>
+          					</ul>
+          				</div>
+          				<div data-bind="if: photos.length < 1">
+          					<P class="text-center">Error retreiving data from Flickr.</P>
+          				</div>
         			</div>
         			<div class="modal-footer">
         			<p>Images from Flickr</p>
@@ -71,11 +76,11 @@
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdsY4LFODHr3YVRwoK4XClAUBQrMS8h9I&libraries=places&callback=initMap">
-    </script>
 	<script src="js/libs/knockout-3.4.1.js"></script>
 	<script src="js/model.js"></script>
 	<script src="js/script.js"></script>
+	<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdsY4LFODHr3YVRwoK4XClAUBQrMS8h9I&libraries=places&callback=initMap" onerror="googleError()">
+    </script>
 </body>
 </html>

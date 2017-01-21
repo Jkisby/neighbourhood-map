@@ -1,6 +1,6 @@
 
 // Viewmodel containing methods to interact with view
-var viewModel = function(map){
+var ViewModel = function(map){
 	var self = this;
 	
 	// knockout observables 
@@ -30,9 +30,9 @@ var viewModel = function(map){
 		});
 		// add listener to marker for info window
 		m.setAnimation(null);
-      			m.addListener('click', function(){
-      				self.getLocationPhotos(this);
-      			});
+      	m.addListener('click', function(){
+      		self.getLocationPhotos(this);
+      	});
       	// add marker to ko observableArray
 		self.locationlist.push(m);
 	});
@@ -51,6 +51,9 @@ var viewModel = function(map){
 	// update landmark list view when select option is changed
 	self.onChange = function(){
 		// remove landmarks if none selected
+		if(self.selectedFilter() == null){
+			return null;
+		}
 		if(self.selectedFilter().getData() == 'none'){
 			for(var i = 0; i < self.landmarklist().length; i++){
 				self.landmarklist()[i].setMap(null);
@@ -70,9 +73,9 @@ var viewModel = function(map){
 			return ko.utils.arrayFilter(self.locationlist(), function(location){
 				var locations = location.getTitle().toLowerCase().startsWith(filter);
 				if(!locations){
-					location.setMap(null);
+					location.setVisible(false);
 				}else{
-					location.setMap(map);
+					location.setVisible(true);
 				}
 				return locations;
 			});
@@ -150,6 +153,8 @@ var viewModel = function(map){
       			});
       			self.landmarklist.push(marker);
     		}		
+  		}else{
+  			alert("Error - Could not connect to google maps");
   		}
 	};
 
@@ -158,7 +163,7 @@ var viewModel = function(map){
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function () {
     		marker.setAnimation(null);
-		}, 750);
+		}, 1400);
 	};
 
 	// Open info window for current marker and close others if open
@@ -187,12 +192,16 @@ var viewModel = function(map){
 	};
 
 	this.setPhotos = function(data, location){
-		for(var i = 0; i < data.photos.photo.length; i++){
-			var item = data.photos.photo[i];
-			self.photos.push("http://farm" + item.farm + ".static.flickr.com/"
-							 + item.server +"/"+ item.id + "_" + item.secret + "_m.jpg");
+		console.log(data);
+		if(!data.photos){
+			return null;
+		}else{
+			for(var i = 0; i < data.photos.photo.length; i++){
+				var item = data.photos.photo[i];
+				self.photos.push("http://farm" + item.farm + ".static.flickr.com/"
+								 + item.server +"/"+ item.id + "_" + item.secret + "_m.jpg");
+			}
 		}
-		
 	};
 
 	// Initiate default set of landmarks
@@ -202,10 +211,14 @@ var viewModel = function(map){
 // Asynchronously load google map from google maps api
 function initMap() {
 	var map = new google.maps.Map(document.getElementById('map'), {
-		 zoom: 15,
-		 center: initialLocations[0].pos
+		zoom: 15,
+		center: initialLocations[0].pos
 	});
-
-	ko.applyBindings(new viewModel(map));
+	ko.applyBindings(new ViewModel(map));
 }
 
+// error handling for google map
+function googleError() {
+	alert("Error connecting to Google maps.");
+	ko.applyBindings(new ViewModel());
+}

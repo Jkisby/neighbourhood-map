@@ -53,9 +53,8 @@ var Type = function(name, type){
 
 // filckr api
 var flickrKey = "e2ef6e98d3def1689b403dfb3945fc8b";
-var flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=" 
-				+ flickrKey 
-				+ "&accuracy=16&lat=%lat%&lon=%lon%&per_page=10&radius=0.1&format=json&jsoncallback=?";
+var flickrAPI = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=" +
+	flickrKey + "&accuracy=16&lat=%lat%&lon=%lon%&per_page=10&radius=0.1&format=json&jsoncallback=?";
 
 // stores flickr photo url
 var Photo = function(photo){
@@ -63,4 +62,5 @@ var Photo = function(photo){
 }
 
 // modal button added to info window
-var modalButton = '</br><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal">View images taken here from Flickr</button>';
+var modalButton = '</br><button type="button" class="btn btn-info btn-sm" data-toggle="modal"' +
+    ' data-target="#myModal">View images taken here from Flickr</button>';
